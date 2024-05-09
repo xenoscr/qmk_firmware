@@ -1,0 +1,27 @@
+// Copyright 2022 xerootg
+// SPDX-License-Identifier: GPL-2.0-or-later
+
+#pragma once
+
+#define HAL_USE_PWM TRUE
+#define HAL_USE_PAL TRUE
+#define HAL_USE_I2C TRUE
+#define HAL_USE_SPI TRUE
+#define HAL_USE_SERIAL TRUE
+#define HAL_USE_USB TRUE
+#define ADC_USE_WAIT TRUE
+#define ADC_USE_MUTUAL_EXCLUSION TRUE
+#define CAN_USE_SLEEP_MODE TRUE
+#define DAC_USE_WAIT TRUE
+#define DAC_USE_MUTUAL_EXCLUSION TRUE
+#define I2C_USE_MUTUAL_EXCLUSION TRUE
+#define MAC_USE_EVENTS TRUE
+#define MMC_NICE_WAITING TRUE
+#define SDC_NICE_WAITING TRUE
+#define SPI_USE_WAIT TRUE
+#define SPI_USE_MUTUAL_EXCLUSION TRUE
+#define USB_USE_WAIT TRUE
+#define WSPI_USE_WAIT TRUE
+#define WSPI_USE_MUTUAL_EXCLUSION TRUE
+
+#include_next <halconf.h>
