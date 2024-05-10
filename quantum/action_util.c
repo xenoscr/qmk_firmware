@@ -23,6 +23,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "keycode_config.h"
 #include <string.h>
 
+/* BEGIN: https://github.com/qmk/qmk_firmware/pull/19405 */
+
+#include "wait.h"
+
+#ifndef KEYBOARD_MOD_PACKET_DELAY
+#    define KEYBOARD_MOD_PACKET_DELAY 0
+#endif
+
+#ifndef KEYBOARD_GENERAL_PACKET_DELAY
+#    define KEYBOARD_GENERAL_PACKET_DELAY 0
+#endif
+
+/* END: https://github.com/qmk/qmk_firmware/pull/19405 */
+
 extern keymap_config_t keymap_config;
 
 static uint8_t real_mods = 0;
@@ -283,6 +297,10 @@ static uint8_t get_mods_for_report(void) {
 }
 
 void send_6kro_report(void) {
+#if (((KEYBOARD_MOD_PACKET_DELAY) > 0) || ((KEYBOARD_GENERAL_PACKET_DELAY) > 0))
+    // Keep track of the state of mods
+    uint8_t old_mods = keyboard_report->mods;
+#endif
     keyboard_report->mods = get_mods_for_report();
 
 #ifdef PROTOCOL_VUSB
@@ -296,10 +314,26 @@ void send_6kro_report(void) {
         host_keyboard_send(keyboard_report);
     }
 #endif
+    
+#if ((KEYBOARD_MOD_PACKET_DELAY) > 0)
+    // If the mods are changing...
+    if (keyboard_report->mods != old_mods) {
+        // Wait for a fixed amount of time to allow the host to process the report
+        wait_ms(KEYBOARD_MOD_PACKET_DELAY);
+    }
+#endif
+#if ((KEYBOARD_GENERAL_PACKET_DELAY) > 0)
+    // Wait for a fixed amount of time to allow the host to process the report
+    wait_ms(KEYBOARD_GENERAL_PACKET_DELAY);
+#endif
 }
 
 #ifdef NKRO_ENABLE
 void send_nkro_report(void) {
+#if (((KEYBOARD_MOD_PACKET_DELAY) > 0) || ((KEYBOARD_GENERAL_PACKET_DELAY) > 0))
+    // Keep track of the state of mods
+    uint8_t old_mods = keyboard_report->mods;
+#endif
     nkro_report->mods = get_mods_for_report();
 
     static report_nkro_t last_report;
@@ -309,6 +343,18 @@ void send_nkro_report(void) {
         memcpy(&last_report, nkro_report, sizeof(report_nkro_t));
         host_nkro_send(nkro_report);
     }
+
+#if ((KEYBOARD_MOD_PACKET_DELAY) > 0)
+    // If the mods are changing...
+    if (keyboard_report->mods != old_mods) {
+        // Wait for a fixed amount of time to allow the host to process the report
+        wait_ms(KEYBOARD_MOD_PACKET_DELAY);
+    }
+#endif
+#if ((KEYBOARD_GENERAL_PACKET_DELAY) > 0)
+    // Wait for a fixed amount of time to allow the host to process the report
+    wait_ms(KEYBOARD_GENERAL_PACKET_DELAY);
+#endif
 }
 #endif
 
